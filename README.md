@@ -1,3 +1,5 @@
+
+## Introduction
 Let’s​ ​say​ ​you​ ​are​ ​on​ ​holiday​ ​and​ ​you​ ​decided​ ​to​ ​go​ ​and​ ​ride​ ​your​ ​brand​ ​new​ ​bicycle​ ​in​ ​the​ ​mountain.​ ​Being​ ​a software​ ​engineer​ ​you​ ​can’t​ ​help​ ​but​ ​value​ ​efficiency,​ ​so​ ​naturally​ ​you​ ​want​ ​to​ ​ride​ ​as​ ​long​ ​as​ ​possible​ ​and​ ​as 
 fast​ ​as​ ​possible​ ​without​ ​having​ ​to​ ​ride​ ​back​ ​up.​ ​So​ ​you​ ​take​ ​a​ ​look​ ​at​ ​the​ ​map​ ​of​ ​the​ ​mountain​ ​and​ ​try​ ​to​ ​find​ ​the longest​ ​run​ ​down​ ​possible.
 
@@ -23,3 +25,6 @@ On​ ​this​ ​particular​ ​map​ ​the​ ​longest​ ​path​ �
 There​ ​is​ ​another​ ​path​ ​that​ ​is​ ​also​ ​length​ ​five:​ ​8-5-3-2-1.​ ​However​ ​the​ ​tie​ ​is​ ​broken​ ​by​ ​the​ ​first​ ​path​ ​being​ ​steeper, dropping​ ​from​ ​9​ ​to​ ​1,​ ​a​ ​drop​ ​of​ ​8,​ ​rather​ ​than​ ​just​ ​8​ ​to​ ​1,​ ​a​ ​drop​ ​of​ ​7. Your​ ​challenge​ ​is​ ​to​ ​write​ ​a​ ​program​ ​in​ ​your​ ​favorite​ ​programming​ ​language​ ​to​ ​find​ ​the​ ​longest​ ​(and​ ​then 
 steepest)​ ​path​ ​on​ ​this​ ​attached​ ​map.txt​ ​file,​ ​specified​ ​in​ ​the​ ​format​ ​above.​ ​It’s​ ​1000x1000​ ​in​ ​size,​ ​and​ ​all​ ​the numbers​ ​on​ ​it​ ​are​ ​between​ ​0​ ​and​ ​1500.
 Good​ ​luck​ ​and​ ​have​ ​fun​ ​!
+
+## How to run
+`ruby mountain_bike.rb`

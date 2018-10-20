@@ -359,7 +359,7 @@ class MountainBike
   end
 end
 
-m = MountainBike.new({file: '2x2_map.txt'})
+m = MountainBike.new({file: 'map.txt'})
 m.work()
 result = m.getAnswer()
 puts result
