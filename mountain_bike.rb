@@ -1,4 +1,19 @@
-# Class definitions
+# Data structure
+# 1. A Field class to store: row, column, value, next row, next column
+# 2. A Path class to store: array of fields, longest path length for each node, longest path length so far
+# 3. A Result class to store: hash of hash of fields of the longest path for each node, start node of longest path(s)
+
+# Strategy
+# For each node
+#   Use DFS to find a list of down slope paths
+#   Get the longest path. If there are more than 1 path with the same length, get the steepest path
+#   For each field in longest path
+#     Mark node as visited
+#     Save field to avoid recomputation when visiting same node
+#   Update longest path starting node
+# Construct the longest path from the longest path start node
+
+
 class Result
   attr_accessor :saved, :longestPathStartNode 
 
@@ -39,93 +54,99 @@ class Field
   end
 end
 
-class Main
-  attr_accessor :visited, :input, :numRows, :numcols, :result
+class MountainBike
+  attr_accessor :visited, :input, :numRows, :numcols, :result, :isOneDimInput
 
-  def initialize()
-    @visited = Hash.new # Keep track of visited nodes. Hash of hash of [r][c]
+  def initialize(options)
+    # Keep track of whether input[i][j] has been visited. Hash of hash of boolean
+    @visited = Hash.new
+    @file = options.fetch(:file)
     @input = []
     @numRows = 0
     @numCols = 0
     @result = Result.new
-    @neighboursDelta = Hash.new
-
-    work()
+    # deltas for N, S, E, W neighbour nodes. Hash of array of [delta row, delta col]
+    @neighbourDelta = Hash.new
+    @neighbourDelta['N'] = [-1, 0]
+    @neighbourDelta['S'] = [1, 0]
+    @neighbourDelta['E'] = [0, 1]
+    @neighbourDelta['W'] = [0, -1]
   end
-
-  # def calculateNeighboursDelta
-  #   isOneDimInput = false
-  #   if (@numRows == 1 || @numCols == 1) then
-  #     isOneDimInput = true
-  #   end
-
-  #   for i in 0..@numRows-1
-  #     for j in 0..@numCols-1
-
-  #     end
-  #   end
-  # end
-
+  
   def work()
-    readFile('4x4_map.txt')
-
-    # calculateNeighboursDelta()
+    readFile(@file)
 
     for r in 0..@numRows-1
       @visited[r] = Hash.new
       @result.saved[r] = Hash.new
     end
 
-    #TODO: Trivial cases:
-    # 1. r == 0 && c == 0
-    # 1. r == 1 || c == 1
-
-    if (@numRows == 0 && @numCols == 0) then
-      puts "File is empty."
-    elsif (@numRows == 1 || @numCols == 1) then
-      put "rows: #{@numRows}, cols: #{numCols}"
-    end
-
-    row = 0
-    while (row < @numRows)
-      col = 0
-      while (col < @numCols)
-        findBestPath(row, col)
-        # puts unwindPathFromNode(row, col).join('-')
-        col = col + 1
+    # No need to run program for trivial cases
+    if ((@numRows != 0 && @numCols != 0) && (@numRows != 1 || @numCols != 1)) then
+      row = 0
+      while (row < @numRows)
+        col = 0
+        while (col < @numCols)
+          findBestPath(row, col)
+          # puts unwindPathFromNode(row, col).join('-')
+          col = col + 1
+        end
+        row = row + 1
       end
-      row = row + 1
     end
-
-    result = getAnswer()
-    puts result
   end
 
   def getCornerNeighbours(r, c)
+    deltaNorthRow, deltaNorthCol = @neighbourDelta['N']
+    deltaSouthRow, deltaSouthCol = @neighbourDelta['S']
+    deltaEastRow, deltaEastCol = @neighbourDelta['E']
+    deltaWestRow, deltaWestCol = @neighbourDelta['W']
+
     if r == 0 then
       if c == 0 then
-        return [].push([r+1, c]).push([r, c+1]).push()
+        return @numRows == 1 ? [].push([r + deltaEastRow, c + deltaEastCol]) : 
+          @numCols == 1 ? [].push([r + deltaSouthRow, c + deltaSouthCol]) :
+            [].push([r + deltaEastRow, c + deltaEastCol]).push([r + deltaSouthRow, c + deltaSouthCol])
       elsif c == @numCols-1 then
-        return [].push([r+1, c]).push([r, c-1])
+        return @numRows == 1 ? [].push([r + deltaWestRow, c + deltaWestCol]) :
+          @numCols == 1 ? [].push([r + deltaSouthRow, c + deltaSouthCol]) :
+            [].push([r + deltaWestRow, c + deltaWestCol]).push([r + deltaSouthRow, c + deltaSouthCol])
       end
     elsif r == @numRows-1 then
       if c == 0 then
-        return [].push([r-1, c]).push([r, c+1])
+        return @numRows == 1 ? [].push([r + deltaEastRow, c + deltaEastCol]) :
+          @numCols == 1 ? [].push([r + deltaNorthRow, c + deltaNorthCol]) :
+            [].push([r + deltaEastRow, c + deltaEastCol]).push([r + deltaNorthRow, c + deltaNorthCol])
       elsif c == @numCols-1 then
-        return [].push([r-1, c]).push([r, c-1])
+        return @numRows == 1 ? [].push([r + deltaWestRow, c + deltaWestCol]) :
+          @numCols == 1 ? [].push([r + deltaNorthRow, c + deltaNorthCol]) :
+            [].push([r + deltaWestRow, c + deltaWestCol]).push([r + deltaNorthRow, c + deltaNorthCol])
       end
     end
   end
 
   def getEdgeNeighbours(r, c)
+    deltaNorthRow, deltaNorthCol = @neighbourDelta['N']
+    deltaSouthRow, deltaSouthCol = @neighbourDelta['S']
+    deltaEastRow, deltaEastCol = @neighbourDelta['E']
+    deltaWestRow, deltaWestCol = @neighbourDelta['W']
+
     if r == 0 then
-      return [].push([r, c-1]).push([r+1, c]).push([r, c+1])
+      return @numRows == 1 ? [].push([r + deltaWestRow, c + deltaWestCol]).push([r + deltaEastRow, c + deltaEastCol]) :
+        [].push([r + deltaWestRow, c + deltaWestCol]).push([r + deltaSouthRow, c + deltaSouthCol])
+        .push([r + deltaEastRow, c + deltaEastCol])
     elsif r == @numRows-1 then
-      return [].push([r, c-1]).push([r-1, c]).push([r, c+1])
+      return @numRows == 1 ? [].push([r + deltaWestRow, c + deltaWestCol]).push([r + deltaEastRow, c + deltaEastCol]) :
+        [].push([r + deltaWestRow, c + deltaWestCol]).push([r + deltaNorthRow, c + deltaNorthCol])
+        .push([r + deltaEastRow, c + deltaEastCol])
     elsif c == 0 then
-      return [].push([r-1, c]).push([r, c+1]).push([r+1, c])
+      return @numCols == 1 ? [].push([r + deltaNorthRow, c + deltaNorthCol]).push([r + deltaSouthRow, c + deltaSouthCol]) :
+        [].push([r + deltaNorthRow, c + deltaNorthCol]).push([r + deltaEastRow, c + deltaEastCol])
+        .push([r + deltaSouthRow, c + deltaSouthCol])
     elsif c == @numCols-1 then
-      return [].push([r-1, c]).push([r, c-1]).push([r+1, c])
+      return @numCols == 1 ? [].push([r + deltaNorthRow, c + deltaNorthCol]).push([r + deltaSouthRow, c + deltaSouthCol]) :
+        [].push([r + deltaNorthRow, c + deltaNorthCol]).push([r + deltaWestRow, c + deltaWestCol])
+        .push([r + deltaSouthRow, c + deltaSouthCol])
     end
   end
 
@@ -156,23 +177,20 @@ class Main
     end
   end
 
-  # add fields to path by traversing through saved result
+  # add fields to path by traversing through saved result, and add path to the list of paths for input[row][col]
   def constructMemoizePath(paths, path, row, col)
     savedEntry = @result.saved[row][col]
     nextRow = savedEntry.nextRow
     nextCol = savedEntry.nextCol
     addFieldToPath(path, savedEntry.row, savedEntry.col, nextRow, nextCol)
 
-    while (true)
+    while (nextRow != nil && nextCol != nil)
       savedEntry = @result.saved[nextRow][nextCol]
       nextRow = savedEntry.nextRow
       nextCol = savedEntry.nextCol
       addFieldToPath(path, savedEntry.row, savedEntry.col, nextRow, nextCol)
-      if (nextRow == nil && nextCol == nil) then
-        paths.push(path)
-        break
-      end
     end
+    paths.push(path)
   end
 
   def addFieldToPath(path, r, c, nextR = nil, nextC = nil)
@@ -236,7 +254,11 @@ class Main
   end
 
   def getAnswer()
-    if @result.longestPathStartNode.length == 1 then
+    if (@numRows == 0 && @numCols == 0) then
+      return "File is empty. Exiting..."
+    elsif (@numRows == 1 && @numCols == 1) then
+      return @input[0][0]
+    elsif @result.longestPathStartNode.length == 1 then
       row = @result.longestPathStartNode[0].row
       col = @result.longestPathStartNode[0].col
       return unwindPathFromNode(row, col).join('-')
@@ -337,4 +359,7 @@ class Main
   end
 end
 
-Main.new
+m = MountainBike.new({file: '2x2_map.txt'})
+m.work()
+result = m.getAnswer()
+# puts result
