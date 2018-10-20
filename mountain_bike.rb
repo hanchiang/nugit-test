@@ -362,4 +362,4 @@ end
 m = MountainBike.new({file: '2x2_map.txt'})
 m.work()
 result = m.getAnswer()
-# puts result
+puts result
